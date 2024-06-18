@@ -17,6 +17,7 @@ require (
 	github.com/google/uuid v1.4.0 // indirect
 	github.com/klauspost/compress v1.15.15 // indirect
 	github.com/muhammadmuzzammil1998/jsonc v1.0.0 // indirect
+	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/sandertv/go-raknet v1.12.0 // indirect
 	github.com/sandertv/gophertunnel v1.36.0 // indirect
 	github.com/segmentio/fasthash v1.0.3 // indirect
