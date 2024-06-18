@@ -13,9 +13,9 @@ classicCommands.Init()
 And have this in your accept handler function:
 
 ```
-for srv.Accept(func(p *player.Player) {<br/>
-  // Your code<br/>
-  classicCommands.PassAccept(p)<br/>
-  // Also your code<br/>
-}) {}<br/>
+for srv.Accept(func(p *player.Player) {
+  // Your code
+  classicCommands.PassAccept(p)
+  // Also your code
+}) {}
 ```
