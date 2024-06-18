@@ -12,6 +12,7 @@ func Init() {
 	cmd.Register(cmd.New("setblock", "...", []string{}, commands.Setblock{}))
 	cmd.Register(cmd.New("list", "Lists the players on the server", []string{}, commands.ListPlayers{}))
 	cmd.Register(cmd.New("tell", "Sends a private message to one or more players", []string{"msg", "w"}, commands.Whisper{}))
+	cmd.Register(cmd.New("teleport", "Teleports players", []string{"tp"}, commands.Teleport{}))
 }
 
 func PassAccept(p *player.Player){
