@@ -1,9 +1,10 @@
-package utils
+package system
 
 import (
 	"github.com/df-mc/dragonfly/server/cmd"
 	"github.com/df-mc/dragonfly/server/player"
 )
+
 
 var PlayerList []*player.Player
 

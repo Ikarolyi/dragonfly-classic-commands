@@ -1,7 +1,8 @@
 package commands
 
 import (
-	"github.com/Ikarolyi/dragonfly-classic-commands/utils"
+	"github.com/Ikarolyi/dragonfly-classic-commands/permissions"
+	"github.com/Ikarolyi/dragonfly-classic-commands/system"
 	"github.com/df-mc/dragonfly/server/cmd"
 	"github.com/df-mc/dragonfly/server/player"
 )
@@ -12,7 +13,11 @@ type Clear struct {
 
 
 func (c Clear) Run(source cmd.Source, output *cmd.Output) {
-	sender := utils.GetSender(source)
+	if !permissions.AuthSource(source, permissions.LEVEL_OPERATOR, output){
+		return
+	}
+
+	sender := system.GetSender(source)
 
 	target, targetSet := c.Player.Load()
 	var targetPlayer *player.Player

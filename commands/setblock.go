@@ -1,7 +1,8 @@
 package commands
 
 import (
-	"github.com/Ikarolyi/dragonfly-classic-commands/utils"
+	"github.com/Ikarolyi/dragonfly-classic-commands/permissions"
+	"github.com/Ikarolyi/dragonfly-classic-commands/system"
 	"github.com/df-mc/dragonfly/server/block/cube"
 	"github.com/df-mc/dragonfly/server/cmd"
 	"github.com/df-mc/dragonfly/server/world"
@@ -14,15 +15,21 @@ type Setblock struct {
 }
 
 func (c Setblock) Run(source cmd.Source, output *cmd.Output) {
-	sender := utils.GetSender(source)
-	if sender == nil{
+	if !permissions.AuthSource(source, permissions.LEVEL_OPERATOR, output){
 		return
 	}
+
+	sender := system.GetSender(source)
+	if sender == nil {
+		return
+	}
+
 
 	w := sender.World()
 
 	b, err := world.BlockByName(c.TileName, nil)
-	if err{
+	if err {
+		output.Errorf("No block with the id >%s< could be found. Maybe it has properties and can't be selected?", c.TileName)
 		return
 	}
 
