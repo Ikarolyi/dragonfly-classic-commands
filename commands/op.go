@@ -11,9 +11,10 @@ type Op struct {
 }
 
 func (c Op) Run(source cmd.Source, output *cmd.Output) {
-	// if !permissions.AuthSource(source, permissions.LEVEL_HOST, output){
-	// 	return
-	// }
+	if !permissions.AuthSource(source, permissions.LEVEL_HOST, output){
+		return
+	}
+	
 	for _, t := range c.Player {
 		p := t.(*player.Player)
 		permissions.SetLevel(p.XUID(), permissions.LEVEL_OPERATOR)
