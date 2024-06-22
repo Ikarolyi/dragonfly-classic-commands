@@ -3,7 +3,7 @@ package commands
 import (
 	"github.com/Ikarolyi/dragonfly-classic-commands/permissions"
 	"github.com/Ikarolyi/dragonfly-classic-commands/system"
-	"github.com/df-mc/dragonfly/server/block/cube"
+	"github.com/df-mc/dragonfly/server/block"
 	"github.com/df-mc/dragonfly/server/cmd"
 	"github.com/df-mc/dragonfly/server/world"
 	"github.com/go-gl/mathgl/mgl64"
@@ -12,14 +12,14 @@ import (
 type SetblockNormal struct {
 	Position mgl64.Vec3
 	TileName system.BlockEnum
-	SetBlockMode cmd.Optional[SetBlockModeEnum]
+	SetBlockMode cmd.Optional[SetBlockModeEnum] `cmd:""`
 }
 
 type SetBlockStates struct{
 	Position mgl64.Vec3
 	TileName system.BlockEnum
 	BlockStates int16
-	SetBlockMode cmd.Optional[SetBlockModeEnum]
+	SetBlockMode cmd.Optional[SetBlockModeEnum] `cmd:""`
 }
 
 type SetBlockModeEnum string
@@ -32,11 +32,11 @@ func (sbme SetBlockModeEnum) Options(source cmd.Source) []string{
 	return []string{"destroy", "keep", "replace"}
 }
 
-func (c SetblockNormal) Run(source cmd.Source, output *cmd.Output) {
+func RunSetblock(Position mgl64.Vec3, TileName system.BlockEnum, BlockStates int16, BlockStatesUsed bool, SetBlockMode cmd.Optional[SetBlockModeEnum], source cmd.Source, output *cmd.Output){
 	if !permissions.AuthSource(source, permissions.LEVEL_OPERATOR, output){
 		return
 	}
-
+	
 	sender := system.GetSender(source)
 	if sender == nil {
 		return
@@ -45,33 +45,49 @@ func (c SetblockNormal) Run(source cmd.Source, output *cmd.Output) {
 
 	w := sender.World()
 
-	b := c.TileName.GetBlock()
+	var b world.Block
 
-	pos := cube.Pos{int(c.Position[0]), int(c.Position[1]), int(c.Position[2])}
+	if BlockStatesUsed{
+		b = TileName.GetBlockWithMeta(BlockStates)
 
-	w.SetBlock(pos, b, &world.SetOpts{DisableBlockUpdates: true, DisableLiquidDisplacement: true})
+		if b == nil{
+			output.Errorf("No meta state >%v< found for %s blocks", BlockStates, TileName)
+			return
+		}
+	}else{
+		b = TileName.GetBlock()
+	}
+
+	pos := system.Vec2Cube(Position)
+
+	setBlockModeVal := SetBlockMode.LoadOr("replace")
+
+	switch setBlockModeVal{
+		case "replace":
+			w.SetBlock(pos, b, &world.SetOpts{DisableBlockUpdates: true, DisableLiquidDisplacement: true})
+		case "destroy":
+			return
+		case "keep":
+			blockOnPos, success := system.GetBlockOnPos(Position, w)
+			if !success{
+				output.Error("Can't check for air: chunk not loaded")
+				return
+			}
+
+			airBlock := block.Air{}
+
+			if blockOnPos == airBlock{
+				w.SetBlock(pos, b, &world.SetOpts{DisableBlockUpdates: true, DisableLiquidDisplacement: true})
+			}else{
+				output.Errorf("Block at [%v, %v, %v] is not air", pos[0], pos[1], pos[2])
+			}
+	}
+}
+
+func (c SetblockNormal) Run(source cmd.Source, output *cmd.Output) {
+	RunSetblock(c.Position, c.TileName, 0, false, c.SetBlockMode, source, output)
 }
 
 func (c SetBlockStates) Run(source cmd.Source, output *cmd.Output) {
-	if !permissions.AuthSource(source, permissions.LEVEL_OPERATOR, output){
-		return
-	}
-
-	sender := system.GetSender(source)
-	if sender == nil {
-		return
-	}
-
-
-	w := sender.World()
-
-	b := c.TileName.GetBlockWithMeta(c.BlockStates)
-
-	if b == nil{
-		output.Errorf("No meta state >%v< found for %s blocks", c.BlockStates, c.TileName)
-	}
-
-	pos := cube.Pos{int(c.Position[0]), int(c.Position[1]), int(c.Position[2])}
-
-	w.SetBlock(pos, b, &world.SetOpts{DisableBlockUpdates: true, DisableLiquidDisplacement: true})
+	RunSetblock(c.Position, c.TileName, c.BlockStates, false, c.SetBlockMode, source, output)
 }
