@@ -2,14 +2,15 @@ package classicCommands
 
 import (
 	"github.com/Ikarolyi/dragonfly-classic-commands/commands"
-	"github.com/Ikarolyi/dragonfly-classic-commands/handlers"
 	"github.com/Ikarolyi/dragonfly-classic-commands/permissions"
+	"github.com/Ikarolyi/dragonfly-classic-commands/system"
+	"github.com/df-mc/dragonfly/server"
 	"github.com/df-mc/dragonfly/server/cmd"
-	"github.com/df-mc/dragonfly/server/player"
 )
 
-func Init() {	
+func Init(srv *server.Server) {
 	permissions.Init()
+	system.Server = srv
 
 	cmd.Register(cmd.New("clear", "Clears the full inventory of a player", []string{}, commands.Clear{}))
 	cmd.Register(cmd.New("setblock", "Changes a block to an other block", []string{}, commands.SetblockNormal{}, commands.SetBlockStates{}))
@@ -23,8 +24,4 @@ func Init() {
 
 func Save() {
 	permissions.Buffer()
-}
-
-func PassAccept(p *player.Player){
-	handlers.HandleJoin(p)
 }

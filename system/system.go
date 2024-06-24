@@ -1,15 +1,20 @@
 package system
 
 import (
+	"math/rand"
+
+	"github.com/df-mc/dragonfly/server"
+	"github.com/df-mc/dragonfly/server/block"
 	"github.com/df-mc/dragonfly/server/block/cube"
 	"github.com/df-mc/dragonfly/server/cmd"
+	"github.com/df-mc/dragonfly/server/entity"
+	"github.com/df-mc/dragonfly/server/item"
 	"github.com/df-mc/dragonfly/server/player"
 	"github.com/df-mc/dragonfly/server/world"
 	"github.com/go-gl/mathgl/mgl64"
 )
 
-
-var PlayerList []*player.Player
+var Server *server.Server
 
 func GetSender(s cmd.Source) *player.Player {
 	if p, isPlayer := s.(*player.Player); isPlayer{
@@ -117,4 +122,57 @@ func GetBlockOnPos(pos mgl64.Vec3, w *world.World) (world.Block, bool){
 
 func Vec2Cube(vec mgl64.Vec3) cube.Pos{
 	return cube.Pos{int(vec[0]), int(vec[1]), int(vec[2])}
+}
+
+func BlockBreakDrops(pos cube.Pos, w *world.World, p *player.Player) {
+	b := w.Block(pos)
+
+	breakable, isBreakable := b.(block.Breakable)
+	if !isBreakable{
+		return
+	}
+
+	breakInfo := breakable.BreakInfo()
+	perfectTools := []item.Tool{
+		item.Axe{Tier: item.ToolTierNetherite},
+		item.Hoe{Tier: item.ToolTierNetherite},
+		item.Shovel{Tier: item.ToolTierNetherite},
+		item.Shears{},
+		item.Pickaxe{Tier: item.ToolTierNetherite},
+	}
+
+	for _, tool := range perfectTools{
+		drops := breakInfo.Drops(tool, nil)
+		if len(drops) != 0{
+			if breakInfo.BreakHandler != nil {
+				breakInfo.BreakHandler(pos, w, p)
+			}
+			
+			if container, ok := b.(block.Container); ok {
+				// If the block is a container, it should drop its inventory contents regardless whether the
+				// player is in creative mode or not.
+				drops = container.Inventory().Items()
+				if breakable, ok := b.(block.Breakable); ok {
+					if breakable.BreakInfo().Harvestable(tool) {
+						drops = append(drops, breakable.BreakInfo().Drops(tool, nil)...)
+					}
+				}
+				container.Inventory().Clear()
+			} else if breakable, ok := b.(block.Breakable); ok {
+				if breakable.BreakInfo().Harvestable(tool) {
+					drops = breakable.BreakInfo().Drops(tool, nil)
+				}
+			} else if it, ok := b.(world.Item); ok {
+				drops = []item.Stack{item.NewStack(it, 1)}
+			}
+
+			for _, drop := range drops {
+				ent := entity.NewItem(drop, pos.Vec3Centre())
+				ent.SetVelocity(mgl64.Vec3{rand.Float64()*0.2 - 0.1, 0.2, rand.Float64()*0.2 - 0.1})
+				w.AddEntity(ent)
+			}
+			return
+		}
+	}
+
 }

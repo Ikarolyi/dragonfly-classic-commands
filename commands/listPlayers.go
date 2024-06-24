@@ -10,7 +10,7 @@ type ListPlayers struct {
 
 func (c ListPlayers) Run(source cmd.Source, output *cmd.Output) {
 	var result string
-	for _, p := range system.PlayerList {
+	for _, p := range system.Server.Players() {
 		result += p.Data().Username + " "
 	}
 

@@ -66,13 +66,10 @@ func RunSetblock(Position mgl64.Vec3, TileName system.BlockEnum, BlockStates int
 		case "replace":
 			w.SetBlock(pos, b, &world.SetOpts{DisableBlockUpdates: true, DisableLiquidDisplacement: true})
 		case "destroy":
-			return
+			system.BlockBreakDrops(pos, w, sender)
+			w.SetBlock(pos, b, &world.SetOpts{DisableBlockUpdates: false, DisableLiquidDisplacement: true})
 		case "keep":
-			blockOnPos, success := system.GetBlockOnPos(Position, w)
-			if !success{
-				output.Error("Can't check for air: chunk not loaded")
-				return
-			}
+			blockOnPos := w.Block(pos)
 
 			airBlock := block.Air{}
 
@@ -80,8 +77,10 @@ func RunSetblock(Position mgl64.Vec3, TileName system.BlockEnum, BlockStates int
 				w.SetBlock(pos, b, &world.SetOpts{DisableBlockUpdates: true, DisableLiquidDisplacement: true})
 			}else{
 				output.Errorf("Block at [%v, %v, %v] is not air", pos[0], pos[1], pos[2])
+				return
 			}
 	}
+	output.Print("Block placed")
 }
 
 func (c SetblockNormal) Run(source cmd.Source, output *cmd.Output) {
