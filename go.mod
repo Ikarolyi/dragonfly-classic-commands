@@ -2,7 +2,10 @@ module github.com/Ikarolyi/dragonfly-classic-commands
 
 go 1.22.3
 
-require github.com/df-mc/dragonfly v0.9.15
+require (
+	github.com/df-mc/dragonfly v0.9.15
+	github.com/go-gl/mathgl v1.1.0
+)
 
 require (
 	github.com/brentp/intintmap v0.0.0-20190211203843-30dc0ade9af9 // indirect
@@ -10,7 +13,6 @@ require (
 	github.com/df-mc/atomic v1.10.0 // indirect
 	github.com/df-mc/goleveldb v1.1.9 // indirect
 	github.com/df-mc/worldupgrader v1.0.13 // indirect
-	github.com/go-gl/mathgl v1.1.0 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.1 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
