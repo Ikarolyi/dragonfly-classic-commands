@@ -20,6 +20,7 @@ func Init(srv *server.Server) {
     cmd.Register(cmd.New("op", "Promotes a player's permission level", []string{}, commands.Op{}))
     cmd.Register(cmd.New("permission", "Reloads permisson.json without buffering", []string{"ops"}, commands.Permission{}))
     cmd.Register(cmd.New("time", "Changes or queries the world's game time", []string{}, commands.AddTime{}, commands.QueryTime{}, commands.SetTimeToTime{}, commands.SetTimeToAmount{}))
+    cmd.Register(cmd.New("gamemode", "Sets a player's game mode", []string{}, commands.GamemodeByEnum{}))
 }
 
 func Save() {
