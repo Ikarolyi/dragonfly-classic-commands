@@ -16,7 +16,7 @@ type GamemodeByEnum struct {
 type GamemodeEnum string
 
 func (ge GamemodeEnum) Type() string{
-	return "SetBlockMode"
+	return "gameMode"
 }
 
 func (ge GamemodeEnum) Options(source cmd.Source) []string{
