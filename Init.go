@@ -1,11 +1,11 @@
 package classicCommands
 
 import (
-    "github.com/Ikarolyi/dragonfly-classic-commands/commands"
-    "github.com/Ikarolyi/dragonfly-classic-commands/permissions"
-    "github.com/Ikarolyi/dragonfly-classic-commands/system"
-    "github.com/df-mc/dragonfly/server"
-    "github.com/df-mc/dragonfly/server/cmd"
+	"github.com/Ikarolyi/dragonfly-classic-commands/commands"
+	"github.com/Ikarolyi/dragonfly-classic-commands/permissions"
+	"github.com/Ikarolyi/dragonfly-classic-commands/system"
+	"github.com/df-mc/dragonfly/server"
+	"github.com/df-mc/dragonfly/server/cmd"
 )
 
 func Init(srv *server.Server) {
@@ -22,6 +22,7 @@ func Init(srv *server.Server) {
     cmd.Register(cmd.New("time", "Changes or queries the world's game time", []string{}, commands.AddTime{}, commands.QueryTime{}, commands.SetTimeToTime{}, commands.SetTimeToAmount{}))
     cmd.Register(cmd.New("gamemode", "Sets a player's game mode", []string{}, commands.GamemodeByEnum{}))
     cmd.Register(cmd.New("say", "Sends a message to the chat", []string{}, commands.Say{}))
+    cmd.Register(cmd.New("weather", "Sets the weather", []string{}, commands.SetWeather{}))
 }
 
 func Save() {
